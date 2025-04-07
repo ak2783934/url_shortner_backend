@@ -66,7 +66,7 @@ func validateShortURL(path string) error {
 	}
 	// Add more validations as needed
 
-	var re = regexp.MustCompile(`^[0-9]+$`)
+	var re = regexp.MustCompile(`^[A-Za-z0-9]+$`)
 
 	if !re.MatchString(path) {
 		return fmt.Errorf("invalid passed short URL")
