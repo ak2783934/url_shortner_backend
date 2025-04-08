@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/ak2783934/url_shortner_backend/db"
 	"github.com/ak2783934/url_shortner_backend/handlers"
@@ -32,9 +33,9 @@ func main() {
 	db.InitSQLDB()
 	registerRoutes()
 
-	port := ":8080"
-	fmt.Printf("Server is running on http://localhost%s\n", port)
-	if err := http.ListenAndServe(port, nil); err != nil {
+	port := os.Getenv("APP_PORT")
+	fmt.Printf("Server is running on http://localhost:%s\n", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		fmt.Println("Error starting server:", err)
 	}
 

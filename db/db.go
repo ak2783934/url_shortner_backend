@@ -13,7 +13,7 @@ func InitSQLDB() {
 	// Initialize the database connection
 	mysqlUser := os.Getenv("MYSQL_USER")
 	mysqlPass := os.Getenv("MYSQL_PASS")
-	mysqlHost := os.Getenv("MYSQL_HOST")
+	mysqlHost := os.Getenv("MYSQL_HOST_GO")
 	mysqlPort := os.Getenv("MYSQL_PORT")
 	mysqlDBNAME := os.Getenv("MYSQL_DB_NAME")
 	connectionURL := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", mysqlUser, mysqlPass, mysqlHost, mysqlPort, mysqlDBNAME)

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASS}
+      MYSQL_DATABASE: ${MYSQL_DB_NAME}
+    ports:
+      - "${MYSQL_PORT}:${MYSQL_PORT}"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+
+  app:
+    build: .
+    container_name: go-app
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    depends_on:
+      - mysql
+    environment:
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASS}
+      DB_NAME: ${MYSQL_DB_NAME}
+      DB_HOST: ${MYSQL_HOST}
+      DB_PORT: 3306
+
+volumes:
+  mysql_data:

@@ -1,6 +1,6 @@
 module github.com/ak2783934/url_shortner_backend
 
-go 1.23.1
+go 1.23
 
 require (
 	github.com/go-sql-driver/mysql v1.9.2
