@@ -40,16 +40,19 @@ func LongToShort(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &reqBody)
 	if err != nil {
 		http.Error(w, "Error unmarshalling request body", http.StatusInternalServerError)
+		return
 	}
 
 	err = validateLongUrl(reqBody.LongURL)
 	if err != nil {
 		http.Error(w, "Invalid long url link", http.StatusBadRequest)
+		return
 	}
 
 	shortURL, err := generateAndSaveShortURL(reqBody.LongURL)
 	if err != nil {
 		http.Error(w, "Error generating short url", http.StatusInternalServerError)
+		return
 	}
 
 	response := LongToShortResponse{
