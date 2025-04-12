@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/ak2783934/url_shortner_backend/db"
@@ -40,6 +42,11 @@ func LongToShort(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error unmarshalling request body", http.StatusInternalServerError)
 	}
 
+	err = validateLongUrl(reqBody.LongURL)
+	if err != nil {
+		http.Error(w, "Invalid long url link", http.StatusBadRequest)
+	}
+
 	shortURL, err := generateAndSaveShortURL(reqBody.LongURL)
 	if err != nil {
 		http.Error(w, "Error generating short url", http.StatusInternalServerError)
@@ -54,7 +61,26 @@ func LongToShort(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+func validateLongUrl(longURL string) error {
+	if longURL == "" {
+		return fmt.Errorf("invalid short URL")
+	}
+	// Add more validations as needed
+	re := regexp.MustCompile(`^(http|https):\/\/[^\s/$.?#].[^\s]*$`)
+	if !re.MatchString(longURL) {
+		return fmt.Errorf("invalid URL format")
+	}
+	return nil
+}
+
 func generateAndSaveShortURL(longURL string) (string, error) {
+	// first check if this long url is already present in the db directly?
+	// if yes, then return that value itself
+	shortURL, _ := db.FetchShorURLFromDB(longURL)
+	if shortURL != "" {
+		return shortURL, nil
+	}
+
 	var shortLink string
 	for {
 		result := make([]byte, numCharsShortLink)
@@ -65,12 +91,16 @@ func generateAndSaveShortURL(longURL string) (string, error) {
 		shortLink = string(result)
 
 		// check if this link is already there in db?
-		url, err := db.FetchFromDB(shortLink)
+		url, err := db.FetchLongURLFromDB(shortLink)
 		if err != nil || url == "" {
 			break
 		}
 	}
 
-	db.SaveToDB(longURL, shortLink)
-	return "https://url_shorter.com/" + shortLink, nil
+	saveErr := db.SaveToDB(longURL, shortLink)
+	if saveErr != nil {
+		return "", saveErr
+	}
+	fmt.Println("succesfully saved long url ", longURL, " short url", shortLink)
+	return shortLink, nil
 }

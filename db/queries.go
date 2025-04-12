@@ -17,7 +17,27 @@ func SaveToDB(longURL string, shortURL string) error {
 	return nil
 }
 
-func FetchFromDB(shortURL string) (string, error) {
+func FetchShorURLFromDB(longURL string) (string, error) {
+	// Prepare the SQL statement
+	rows, err := DB.Query("SELECT short_url FROM url_shortner WHERE long_url = ?", longURL)
+	if err != nil {
+		log.Println("Error executing query:", err)
+		return "", err
+	}
+	defer rows.Close()
+	var shortURL string
+	if rows.Next() {
+		err := rows.Scan(&shortURL)
+		if err != nil {
+			log.Println("Error scanning row:", err)
+			return "", err
+		}
+	}
+
+	return shortURL, nil
+}
+
+func FetchLongURLFromDB(shortURL string) (string, error) {
 	// Prepare the SQL statement
 	rows, err := DB.Query("SELECT long_url FROM url_shortner WHERE short_url = ?", shortURL)
 	if err != nil {
