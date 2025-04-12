@@ -8,6 +8,7 @@ import (
 
 	"github.com/ak2783934/url_shortner_backend/db"
 	"github.com/ak2783934/url_shortner_backend/handlers"
+	"github.com/ak2783934/url_shortner_backend/middleware"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
@@ -20,12 +21,12 @@ func initEnvVeriables() {
 }
 
 func registerRoutes() {
-	http.HandleFunc("/long-to-short", handlers.LongToShort)
-	http.HandleFunc("/", handlers.ShortToLong)
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/long-to-short", middleware.EnableCORS(handlers.LongToShort))
+	http.HandleFunc("/", middleware.EnableCORS(handlers.ShortToLong))
+	http.HandleFunc("/health", middleware.EnableCORS(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, "OK")
-	})
+	}))
 }
 
 func main() {
