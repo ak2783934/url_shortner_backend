@@ -49,8 +49,8 @@ func ShortToLong(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func fetchURLFromURLShortner(path string) (string, error) {
-	longURL, err := db.FetchFromDB(path)
+func fetchURLFromURLShortner(shortURL string) (string, error) {
+	longURL, err := db.FetchLongURLFromDB(shortURL)
 	if err != nil {
 		log.Println("Error fetching URL from database:", err)
 		return "", err
